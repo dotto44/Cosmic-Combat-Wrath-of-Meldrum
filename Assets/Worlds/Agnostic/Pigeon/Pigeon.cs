@@ -12,10 +12,14 @@ public class Pigeon : MonoBehaviour
     public Vector3 cockpitPoint { get; protected set; }
     public Vector3 startPoint { get; protected set; }
     public float xVelocity { get; protected set; }
+    public bool inCockpit { get; protected set; }
+
+    
 
     float midX;
     float distance;
     float a;
+    public bool travelingRight { get; protected set; }
 
     UIHolder uiHolder;
     Animator anim;
@@ -34,6 +38,8 @@ public class Pigeon : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (inCockpit) return;
+
         if(collision.gameObject.tag == "Player")
         {
             EnterRange();
@@ -42,6 +48,8 @@ public class Pigeon : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
+        if (inCockpit) return;
+
         if (collision.gameObject.tag == "Player")
         {
             ExitRange();
@@ -68,7 +76,7 @@ public class Pigeon : MonoBehaviour
 
     private void CheckForEnterPress()
     {
-        if (inRange && gameInputManager.GetButtonDown("PickUp"))
+        if (inRange && gameInputManager.GetButtonDown("PickUp") && norm.grounded)
         {
             try
             {
@@ -93,13 +101,37 @@ public class Pigeon : MonoBehaviour
         xVelocity = baseVelocity * (distance / 2.5f);
 
         a = -3f/Mathf.Pow(startPoint.x - midX, 2);
+
+        travelingRight = startPoint.x < cockpitPoint.x;
         
     }
     
     public float CalculateYPoint(float x)
     {
         float y = a * Mathf.Pow(x - midX, 2) + 3 + startPoint.y;
-        //float y = -1 * 0.4445f * Mathf.Pow(x - midX, 2) + Mathf.Pow(distance / 3, 2) + startPoint.y;
         return y;
+    }
+
+    public void CloseCockpit()
+    {
+        Debug.Log("Close cock called");
+        anim.CrossFade("Close", 0.0f);
+        inCockpit = true;
+    }
+
+    public void BlastOff()
+    {
+        anim.CrossFade("BlastOff", 0.0f);
+    }
+
+    public void ClosedCockpit()
+    {
+        if (!inCockpit) return;
+        BlastOff();
+    }
+
+    public bool NormReachedCockpit()
+    {
+        return Vector2.Distance(norm.transform.position, cockpitPoint) < 0.1f || norm.transform.position.x > cockpitPoint.x && travelingRight || norm.transform.position.x < cockpitPoint.x && !travelingRight;
     }
 }

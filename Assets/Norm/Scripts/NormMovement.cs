@@ -320,17 +320,22 @@ public class NormMovement : MonoBehaviour
 
     protected void MoveIntoCockpit()
     {
-        if (activeLayer != (int)AnimationLayers.Pigeon) return;
+        if (activeLayer != (int)AnimationLayers.Pigeon || pigeon.inCockpit) return;
         startTime++;
         rb2d.position = new Vector3(rb2d.position.x, pigeon.CalculateYPoint(rb2d.position.x));
-        if (transform.position.x < pigeon.cockpitPoint.x)
+        if (pigeon.travelingRight)
         {
             velocity.x = pigeon.xVelocity;
         }
         else
         {
-            Debug.Log(startTime);
             velocity.x = -1f * pigeon.xVelocity;
+        }
+
+        if(pigeon.NormReachedCockpit())
+        {
+            animator.CrossFade("Hidden", 0, (int)AnimationLayers.Pigeon);
+            pigeon.CloseCockpit();
         }
     }
 
