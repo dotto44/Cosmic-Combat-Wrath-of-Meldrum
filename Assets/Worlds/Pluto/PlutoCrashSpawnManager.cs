@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cinemachine;
 
 public class PlutoCrashSpawnManager : MonoBehaviour
 {
@@ -39,9 +40,9 @@ public class PlutoCrashSpawnManager : MonoBehaviour
         norm.GetComponent<NormMovement>().flipSprite = true;
         section1.SetActive(false);
         section2.SetActive(true);
+        snowHolder.SetActive(false);
         camera0.SetActive(false);
         camera4.SetActive(true);
-        snowHolder.SetActive(false);
         StartCoroutine("rewarmSnow");
     }
 

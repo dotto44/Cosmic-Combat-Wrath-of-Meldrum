@@ -7,6 +7,13 @@ using System;
 public class Pigeon : MonoBehaviour
 {
     public readonly float baseVelocity = 5f;
+    public enum States
+    {
+        Grounded,
+        Landing
+    }
+
+    public States state { get; set; }
 
     public bool inRange { get; protected set; }
     public Vector3 cockpitPoint { get; protected set; }
@@ -26,6 +33,7 @@ public class Pigeon : MonoBehaviour
     private Player gameInputManager;
     NormMovement norm;
 
+    [SerializeField] SpriteRenderer glass;
     [SerializeField] Transform cockpit;
 
     private void Awake()
@@ -38,7 +46,7 @@ public class Pigeon : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (inCockpit) return;
+        if (state == States.Landing || inCockpit) return;
 
         if(collision.gameObject.tag == "Player")
         {
@@ -48,7 +56,7 @@ public class Pigeon : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (inCockpit) return;
+        if (state == States.Landing || inCockpit) return;
 
         if (collision.gameObject.tag == "Player")
         {
@@ -109,12 +117,12 @@ public class Pigeon : MonoBehaviour
     public float CalculateYPoint(float x)
     {
         float y = a * Mathf.Pow(x - midX, 2) + 3 + startPoint.y;
+        if (y > startPoint.y + 2) glass.color = new Color(1, 1, 1, 1);
         return y;
     }
 
     public void CloseCockpit()
     {
-        Debug.Log("Close cock called");
         anim.CrossFade("Close", 0.0f);
         inCockpit = true;
     }
@@ -133,5 +141,10 @@ public class Pigeon : MonoBehaviour
     public bool NormReachedCockpit()
     {
         return Vector2.Distance(norm.transform.position, cockpitPoint) < 0.1f || norm.transform.position.x > cockpitPoint.x && travelingRight || norm.transform.position.x < cockpitPoint.x && !travelingRight;
+    }
+
+    public void Land()
+    {
+        anim.CrossFade("Land", 0.0f);
     }
 }
