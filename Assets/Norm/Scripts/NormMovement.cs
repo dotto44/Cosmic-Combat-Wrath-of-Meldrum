@@ -307,22 +307,59 @@ public class NormMovement : MonoBehaviour
         stickObject.transform.position = new Vector3(transform.position.x, transform.position.y + 1.75f, transform.position.z);
         stickObject.GetComponent<RakePickup>().startShine();
     }
-    int startTime = 0;
+
     public void EnterPigeon(Pigeon pigeon)
     {
         movementLock = true;
-        isGravity = false;
         this.pigeon = pigeon;
         pigeon.SetPath();
         setAnimatorLayer((int)AnimationLayers.Pigeon);
 
     }
 
+    public void ExitPigeon(Pigeon pigeon)
+    {
+        this.pigeon = pigeon;
+        pigeon.SetReversePath();
+        animator.CrossFade("SpinJump", 0, (int)AnimationLayers.Pigeon);
+    }
+
+    public void PlaceIntoCockpit(Pigeon pigeon)
+    {
+        this.pigeon = pigeon;
+        movementLock = true;
+        setAnimatorLayer((int)AnimationLayers.Pigeon);
+        animator.CrossFade("Hidden", 0, (int)AnimationLayers.Pigeon);
+        rb2d.position = pigeon.cockpitPoint;
+    }
+
+    public void MoveOutOfCockpit()
+    {
+        if (activeLayer != (int)AnimationLayers.Pigeon || pigeon.state != Pigeon.States.Exit) return;
+        rb2d.position = new Vector3(rb2d.position.x, pigeon.CalculateYPoint(rb2d.position.x));
+
+        if (pigeon.travelingRight)
+        {
+            velocity.x = pigeon.xVelocity;
+        }
+        else
+        {
+            velocity.x = -1f * pigeon.xVelocity;
+        }
+
+        if (pigeon.NormReachedGround())
+        {
+            setAnimatorLayer((int)AnimationLayers.Base);
+            movementLock = false;
+            pigeon.FinishedExit();
+        }
+    }
+
     protected void MoveIntoCockpit()
     {
-        if (activeLayer != (int)AnimationLayers.Pigeon || pigeon.inCockpit) return;
-        startTime++;
+        if (activeLayer != (int)AnimationLayers.Pigeon || pigeon.inCockpit || pigeon.state != Pigeon.States.Enter) return;
         rb2d.position = new Vector3(rb2d.position.x, pigeon.CalculateYPoint(rb2d.position.x));
+        
         if (pigeon.travelingRight)
         {
             velocity.x = pigeon.xVelocity;
@@ -337,11 +374,6 @@ public class NormMovement : MonoBehaviour
             animator.CrossFade("Hidden", 0, (int)AnimationLayers.Pigeon);
             pigeon.CloseCockpit();
         }
-    }
-
-    protected void MoveIntoCockPitCosmetic()
-    {
-
     }
 
     public void obtainItemEnd()
@@ -398,7 +430,8 @@ public class NormMovement : MonoBehaviour
         velocity.x = targetVelocity.x + conveyorModifier;
 
         MoveIntoCockpit();
-
+        MoveOutOfCockpit();
+        
         if (velocity.y <= maxFallSpeed)
         {
             velocity.y = maxFallSpeed;
@@ -422,7 +455,7 @@ public class NormMovement : MonoBehaviour
 
         move = Vector2.up * deltaPosition.y;
 
-        if (isGravity) Movement(move, true);
+        Movement(move, true);
 
         if (grounded && timeAtMaxSpeed > fallHeightLimit)
         {

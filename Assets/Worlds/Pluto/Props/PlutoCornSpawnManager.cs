@@ -28,5 +28,6 @@ public class PlutoCornSpawnManager : MonoBehaviour
     void SpawnAtPigeon()
     {
         pigeon.Land();
+        norm.GetComponent<NormMovement>().PlaceIntoCockpit(pigeon);
     }
 }

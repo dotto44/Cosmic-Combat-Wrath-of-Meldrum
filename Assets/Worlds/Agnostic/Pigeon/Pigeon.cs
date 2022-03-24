@@ -7,10 +7,12 @@ using System;
 public class Pigeon : MonoBehaviour
 {
     public readonly float baseVelocity = 5f;
+    private Vector3 groundPoint;
     public enum States
     {
-        Grounded,
-        Landing
+        Idle,
+        Exit,
+        Enter
     }
 
     public States state { get; set; }
@@ -38,6 +40,7 @@ public class Pigeon : MonoBehaviour
 
     private void Awake()
     {
+        groundPoint = new Vector3(transform.position.x + 5, transform.position.y, 10);
         cockpitPoint = cockpit.position;
         gameInputManager = ReInput.players.GetPlayer(0);
         anim = GetComponent<Animator>();
@@ -46,7 +49,7 @@ public class Pigeon : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (state == States.Landing || inCockpit) return;
+        if (inCockpit) return;
 
         if(collision.gameObject.tag == "Player")
         {
@@ -56,7 +59,7 @@ public class Pigeon : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (state == States.Landing || inCockpit) return;
+        if (inCockpit) return;
 
         if (collision.gameObject.tag == "Player")
         {
@@ -111,8 +114,25 @@ public class Pigeon : MonoBehaviour
         a = -3f/Mathf.Pow(startPoint.x - midX, 2);
 
         travelingRight = startPoint.x < cockpitPoint.x;
-        
+
+        state = States.Enter;
     }
+
+    public void SetReversePath()
+    {
+        startPoint = cockpitPoint;
+        midX = (startPoint.x + groundPoint.x) / 2;
+        distance = Mathf.Abs(startPoint.x - groundPoint.x);
+
+        xVelocity = baseVelocity * (distance / 2.5f);
+
+        a = -3f / Mathf.Pow(startPoint.x - midX, 2);
+
+        travelingRight = startPoint.x < groundPoint.x;
+        Debug.Log(groundPoint);
+        state = States.Exit;
+    }
+
     
     public float CalculateYPoint(float x)
     {
@@ -125,6 +145,7 @@ public class Pigeon : MonoBehaviour
     {
         anim.CrossFade("Close", 0.0f);
         inCockpit = true;
+       
     }
 
     public void BlastOff()
@@ -135,7 +156,19 @@ public class Pigeon : MonoBehaviour
     public void ClosedCockpit()
     {
         if (!inCockpit) return;
+        state = States.Idle;
         BlastOff();
+    }
+
+    public void FinishedExit()
+    {
+        state = States.Idle;
+    }
+
+    public void OpenedCockput()
+    {
+        if (!inCockpit) return;
+        norm.ExitPigeon(this);
     }
 
     public bool NormReachedCockpit()
@@ -143,8 +176,20 @@ public class Pigeon : MonoBehaviour
         return Vector2.Distance(norm.transform.position, cockpitPoint) < 0.1f || norm.transform.position.x > cockpitPoint.x && travelingRight || norm.transform.position.x < cockpitPoint.x && !travelingRight;
     }
 
+    public bool NormReachedGround()
+    {
+        return Vector2.Distance(norm.transform.position, groundPoint) < 0.1f || norm.transform.position.x > groundPoint.x && travelingRight || norm.transform.position.x < groundPoint.x && !travelingRight;
+    }
+
     public void Land()
     {
         anim.CrossFade("Land", 0.0f);
+        inCockpit = true;
+        glass.color = new Color(1, 1, 1, 1);
+    }
+
+    public void Landed()
+    {
+        anim.CrossFade("Open", 0.0f);
     }
 }

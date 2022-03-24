@@ -15,6 +15,7 @@ public class PersistentItemSpawner : MonoBehaviour
         }
         if (!GameObject.FindGameObjectWithTag("SceneLoader"))
         {
+            Debug.Log("Instantiate");
             Instantiate(loadPrefab);
         }
     }

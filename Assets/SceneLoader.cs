@@ -13,6 +13,7 @@ public class SceneLoader : MonoBehaviour
 
     private void Awake()
     {
+        lastScene = "Venus";
         DontDestroyOnLoad(gameObject);
     }
 
