@@ -119,10 +119,6 @@ public class Spirox : EnemyPhysicsObject
                 targetVelocityX = 0;
                 break;
             case "UhOh":
-                if(transform.position.y < 2 && !DataService.Instance.saveData.getBeatSpirox())
-                {
-                    DataService.Instance.saveData.setBeatSpirox();
-                }
                 break;
             case "Charge":
                 targetVelocityX = chargeDirection;

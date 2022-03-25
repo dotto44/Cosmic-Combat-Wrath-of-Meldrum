@@ -4,12 +4,14 @@ using UnityEngine;
 
 public class FloorPieces : MonoBehaviour
 {
+    [SerializeField] GameObject roofBlocker;
     [SerializeField] GameObject floorPiece2;
     [SerializeField] GameObject floorPiece3;
     [SerializeField] GameObject floorPiece4;
     [SerializeField] GameObject floorPiece5;
     [SerializeField] GameObject floorPiece6;
 
+    [SerializeField] GameObject camera4Transition;
     [SerializeField] GameObject spirox;
 
     public void staggerFloorPieces()
@@ -81,11 +83,14 @@ public class FloorPieces : MonoBehaviour
 
     public void destroyAll()
     {
+        GetComponent<BoxCollider2D>().enabled = false;
         Destroy(floorPiece2);
         Destroy(floorPiece3);
         Destroy(floorPiece4);
         Destroy(floorPiece5);
         Destroy(floorPiece6);
+        Destroy(roofBlocker);
+        Destroy(camera4Transition);
     }
 
     IEnumerator drop()

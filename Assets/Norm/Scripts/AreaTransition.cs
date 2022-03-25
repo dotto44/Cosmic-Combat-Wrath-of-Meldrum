@@ -5,7 +5,14 @@ using UnityEngine.SceneManagement;
 
 public class AreaTransition : MonoBehaviour
 {
-    [SerializeField] bool exitRight;
+    enum Directions
+    {
+        Left,
+        Right,
+        Up,
+        Down
+    }
+    [SerializeField] Directions exitDirection;
     [SerializeField] string sceneName;
     SceneLoader sceneLoader;
 
@@ -13,13 +20,21 @@ public class AreaTransition : MonoBehaviour
     {
         if (sceneLoader == null) sceneLoader = GameObject.FindGameObjectWithTag("SceneLoader").GetComponent<SceneLoader>();
 
-        if (collision.gameObject.transform.position.x > transform.position.x && exitRight)
+        if (collision.gameObject.transform.position.x > transform.position.x && exitDirection == Directions.Right)
         {
             sceneLoader.moveScenes(sceneName);
         }
-        else if(collision.gameObject.transform.position.x < transform.position.x && !exitRight)
+        else if(collision.gameObject.transform.position.x < transform.position.x && exitDirection == Directions.Left)
         {
             sceneLoader.moveScenes(sceneName);
-        } 
+        }
+        else if(collision.gameObject.transform.position.y > transform.position.y && exitDirection == Directions.Up)
+        {
+            sceneLoader.moveScenes(sceneName);
+        }
+        else if (collision.gameObject.transform.position.y < transform.position.y && exitDirection == Directions.Down)
+        {
+            sceneLoader.moveScenes(sceneName);
+        }
     }
 }
