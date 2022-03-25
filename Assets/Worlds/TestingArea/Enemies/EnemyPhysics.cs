@@ -353,8 +353,8 @@ public class EnemyPhysicsObject : MonoBehaviour
     public virtual void knockback(Vector2 pos, float multiplier)
     {
         flash();
-
-        if (pos.x <= 0.001 && pos.y <= 0.001) return;
+        
+        if (Mathf.Abs(pos.x) <= 0.001 && Mathf.Abs(pos.y) <= 0.001) return;
 
         knockbackUpSpeed = pos.y * multiplier * knockbackUpSpeedMax * enemyMultiplier;
         knockbackSpeed = pos.x * multiplier * knockbackSpeedMax * enemyMultiplier;
