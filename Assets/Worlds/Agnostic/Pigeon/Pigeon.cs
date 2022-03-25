@@ -129,7 +129,7 @@ public class Pigeon : MonoBehaviour
         a = -3f / Mathf.Pow(startPoint.x - midX, 2);
 
         travelingRight = startPoint.x < groundPoint.x;
-        Debug.Log(groundPoint);
+        
         state = States.Exit;
     }
 
@@ -137,8 +137,20 @@ public class Pigeon : MonoBehaviour
     public float CalculateYPoint(float x)
     {
         float y = a * Mathf.Pow(x - midX, 2) + 3 + startPoint.y;
-        if (y > startPoint.y + 2) glass.color = new Color(1, 1, 1, 1);
+        if (y > startPoint.y + 2) InvertGlass(); 
         return y;
+    }
+
+    private void InvertGlass()
+    {
+        if(state == States.Exit)
+        {
+            glass.color = new Color(1, 1, 1, 0);
+        }
+        else
+        {
+            glass.color = new Color(1, 1, 1, 1);
+        }
     }
 
     public void CloseCockpit()
@@ -163,6 +175,8 @@ public class Pigeon : MonoBehaviour
     public void FinishedExit()
     {
         state = States.Idle;
+        inCockpit = false;
+        inRange = true;
     }
 
     public void OpenedCockput()
