@@ -22,7 +22,7 @@ public class Pigeon : MonoBehaviour
     public Vector3 startPoint { get; protected set; }
     public float xVelocity { get; protected set; }
     public bool inCockpit { get; protected set; }
-
+    public string pigeonTarget { get; set; }
     
 
     float midX;
@@ -30,6 +30,7 @@ public class Pigeon : MonoBehaviour
     float a;
     public bool travelingRight { get; protected set; }
 
+    SceneLoader sceneLoader;
     UIHolder uiHolder;
     Animator anim;
     private Player gameInputManager;
@@ -40,6 +41,7 @@ public class Pigeon : MonoBehaviour
 
     private void Awake()
     {
+        pigeonTarget = "VenusStart";
         groundPoint = new Vector3(transform.position.x + 5, transform.position.y, 10);
         cockpitPoint = cockpit.position;
         gameInputManager = ReInput.players.GetPlayer(0);
@@ -163,6 +165,13 @@ public class Pigeon : MonoBehaviour
     public void BlastOff()
     {
         anim.CrossFade("BlastOff", 0.0f);
+    }
+
+    public void BlastedOff()
+    {
+        if (sceneLoader == null) sceneLoader = GameObject.FindGameObjectWithTag("SceneLoader").GetComponent<SceneLoader>();
+
+        sceneLoader.MoveScenesLong(pigeonTarget);
     }
 
     public void ClosedCockpit()
